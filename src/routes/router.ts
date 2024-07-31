@@ -1,11 +1,8 @@
 import { Router } from "express";
+import { basic } from "../controllers/controller";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.status(200).send({
-    message: "sucess",
-  });
-});
+router.get("/", basic);
 
 export default router;
