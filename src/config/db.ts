@@ -10,6 +10,7 @@ const db = new Sequelize({
   dialect: "postgres",
   // models: [__dirname + "/../models/**/*.ts"],
   models: [path.join(__dirname, "../models/**/*.ts")],
+  logging: false,
 });
 
 export default db;

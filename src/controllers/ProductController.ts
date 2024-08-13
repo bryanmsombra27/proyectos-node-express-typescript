@@ -77,7 +77,7 @@ const createProduct = async (req: Request, res: Response) => {
 
     const product = await Product.create(req.body);
 
-    return res.status(200).send({
+    return res.status(201).send({
       message: "success",
       data: product,
     });
