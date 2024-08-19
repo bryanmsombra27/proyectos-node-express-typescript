@@ -8,6 +8,7 @@ import ProductRoutes from "./routes/ProductRouter";
 // CONFIG DOCS
 import swaggerSpec from "./config/swagger";
 import swaggerUI from "swagger-ui-express";
+import morgan from "morgan";
 
 const conectarDB = async () => {
   try {
@@ -25,6 +26,7 @@ const conectarDB = async () => {
 };
 
 conectarDB();
+app.use(morgan("dev"));
 app.use(cors());
 app.use(json());
 app.use(

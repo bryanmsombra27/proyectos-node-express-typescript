@@ -1,6 +1,8 @@
 import swaggerJSDoc from "swagger-jsdoc";
 
 const options: swaggerJSDoc.Options = {
+  openapi: "3.0.0",
+
   swaggerDefinition: {
     info: {
       version: "1.0.0",
@@ -14,7 +16,7 @@ const options: swaggerJSDoc.Options = {
       },
     ],
   },
-  apis: ["./src/routes/ProductRouter.ts"],
+  apis: ["/src/routes/ProductRouter.ts"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

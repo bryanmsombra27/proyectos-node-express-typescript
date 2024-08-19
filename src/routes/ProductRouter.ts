@@ -12,6 +12,18 @@ import { validarCampos } from "../middleware/expressValidator";
 const router = Router();
 
 router.get("/", getProducts);
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *         id:
+ *             type: integer
+ *             description: The product ID
+ *             example: 1
+ */
 router.get("/:id", getProductById);
 router.post(
   "/",
