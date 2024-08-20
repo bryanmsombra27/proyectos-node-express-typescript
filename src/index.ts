@@ -7,7 +7,7 @@ import ProductRoutes from "./routes/ProductRouter";
 
 // CONFIG DOCS
 import swaggerSpec from "./config/swagger";
-import swaggerUI from "swagger-ui-express";
+// import swaggerUI from "swagger-ui-express";
 import morgan from "morgan";
 
 const conectarDB = async () => {
@@ -35,12 +35,7 @@ app.use(
   })
 );
 app.use("/api/products", ProductRoutes);
-app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
-app.get("/api", (req, res) => {
-  return res.send({
-    msg: "desde api",
-  });
-});
+// app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.listen(process.env.PORT, () => {
   console.log(`corriendo en el puerto:  ${process.env.PORT}`);

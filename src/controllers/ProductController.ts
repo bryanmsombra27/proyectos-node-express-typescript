@@ -5,11 +5,7 @@ import { check, validationResult } from "express-validator";
 const getProducts = async (req: Request, res: Response) => {
   try {
     const products = await Product.findAndCountAll({
-      where: {
-        availability: true,
-      },
-      order: ["id", "DESC"],
-      attributes: ["name", "price", "id"],
+      order: [["id", "DESC"]],
     });
 
     return res.status(200).send({
@@ -30,9 +26,7 @@ const getProductById = async (req: Request, res: Response) => {
     const product = await Product.findOne({
       where: {
         id,
-        availability: true,
       },
-      attributes: ["name", "price", "id"],
     });
 
     if (!product) {
@@ -121,16 +115,12 @@ const updateProduct = async (req: Request, res: Response) => {
 const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const product = await Product.update(
-      {
-        availability: false,
+
+    const product = await Product.destroy({
+      where: {
+        id,
       },
-      {
-        where: {
-          id,
-        },
-      }
-    );
+    });
 
     if (!product) {
       throw new Error("No se encontro producto");
