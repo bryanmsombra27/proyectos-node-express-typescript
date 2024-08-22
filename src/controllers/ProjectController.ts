@@ -20,7 +20,7 @@ export class ProjectController {
   };
   static getOneProject = async (req: Request, res: Response) => {
     try {
-      const project = await Project.findById(req.params.id);
+      const project = await Project.findById(req.params.id).populate("tasks");
 
       if (!project) {
         const error = new Error("No se encontro proyecto");
