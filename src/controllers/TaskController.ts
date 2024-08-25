@@ -54,9 +54,12 @@ export class TaskController {
       const { taskId } = req.params;
 
       const task = await Task.findOne({
-        project: project.id,
-        id: taskId,
+        project: project._id,
+        _id: taskId,
       }).populate("project");
+
+      console.log(task, "TAREA");
+      console.log(project._id, "ID PROYECTO");
 
       if (!task) {
         const error = new Error("No se encontro tarea");
@@ -66,7 +69,7 @@ export class TaskController {
         });
       }
 
-      return res.status(201).send({
+      return res.status(200).send({
         status: "success",
         message: "Tarea recuperada con exito!",
         task,
@@ -86,8 +89,8 @@ export class TaskController {
 
       const task = await Task.findOneAndUpdate(
         {
-          project: project.id,
-          id: taskId,
+          project: project._id,
+          _id: taskId,
         },
         { ...req.body },
         { new: true }
@@ -101,7 +104,7 @@ export class TaskController {
         });
       }
 
-      return res.status(201).send({
+      return res.status(200).send({
         status: "success",
         message: "Tarea actualizada con exito!",
         task,
@@ -120,8 +123,8 @@ export class TaskController {
       const { taskId } = req.params;
 
       const task = await Task.findOneAndDelete({
-        project: project.id,
-        id: taskId,
+        project: project._id,
+        _id: taskId,
       });
       if (!task) {
         const error = new Error("No se encontro tarea");
@@ -136,7 +139,7 @@ export class TaskController {
       );
       await project.save();
 
-      return res.status(201).send({
+      return res.status(200).send({
         status: "success",
         message: "Tarea eliminada con exito!",
         task,
@@ -156,8 +159,8 @@ export class TaskController {
 
       const task = await Task.findOneAndUpdate(
         {
-          project: project.id,
-          id: taskId,
+          project: project._id,
+          _id: taskId,
         },
         {
           status: req.body.status,

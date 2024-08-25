@@ -100,7 +100,7 @@ router.delete(
 
     validarCampos,
   ],
-  TaskController.getProjectTaskById
+  TaskController.deleteProjectTask
 );
 
 router.post(
@@ -111,7 +111,7 @@ router.post(
     body("status").notEmpty().withMessage("El estado es obligatorio"),
     validarCampos,
   ],
-  TaskController.getProjectTaskById
+  TaskController.updateProjectTaskStatus
 );
 
 export default router;
