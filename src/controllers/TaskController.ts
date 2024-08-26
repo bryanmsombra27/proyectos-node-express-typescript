@@ -32,7 +32,7 @@ export class TaskController {
       const { project } = req;
 
       const tasks = await Task.find({
-        project: project.id,
+        project: project._id,
       }).populate("project");
 
       return res.status(201).send({
@@ -177,12 +177,7 @@ export class TaskController {
         });
       }
 
-      project.tasks = project.tasks.filter(
-        (projectTask) => projectTask.toString() !== task.id.toString()
-      );
-      await project.save();
-
-      return res.status(201).send({
+      return res.status(200).send({
         status: "success",
         message: "Estatus actualizado con exito!",
         task,
