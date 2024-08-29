@@ -1,10 +1,60 @@
 import { Request, Response } from "express";
 import User from "../models/User";
-import { passwordHashed } from "../helpers/PasswordHashed";
+import { passwordHashed, passwordVerify } from "../helpers/PasswordHashed";
+import { tokenSixDigits } from "../helpers/Token";
+import Token from "../models/Token";
+import transporter from "../config/transport";
+import { AuthEmail } from "../emails/authEmail";
 
 export class Auth {
   static login = async (req: Request, res: Response) => {
     try {
+      const user = await User.findOne({
+        email: req.body.email,
+      });
+
+      if (!user) {
+        const error = new Error("No se encontro el usuario");
+
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+      if (!user.confirmed) {
+        const token = tokenSixDigits();
+
+        await Token.create({
+          user: user._id,
+          token,
+        });
+
+        AuthEmail.sendConfirmationEmail({
+          email: user.email,
+          name: user.name,
+          token,
+        });
+
+        const error = new Error(
+          "Debes confirmar la cuenta antes de acceder, se te ha enviado un enlace para confirmar tu cuenta a tu correo"
+        );
+
+        return res.status(401).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+      const verifyPass = await passwordVerify(req.body.password, user.password);
+
+      if (!verifyPass) {
+        const error = new Error("La contraseña es invalida");
+
+        return res.status(400).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
       return res.status(200).send({
         status: "success",
         message: "Acceso Exitoso!",
@@ -30,16 +80,64 @@ export class Auth {
           message: error.message,
         });
       }
+      // GENERAR TOKEN DE CONFIRMACION DE CUENTA
+      const token = tokenSixDigits();
 
-      await User.create({
+      const userCreated = await User.create({
         ...req.body,
         password: hashPassword,
+      });
+
+      await Token.create({
+        token,
+        user: userCreated._id,
+      });
+
+      AuthEmail.sendConfirmationEmail({
+        email: userCreated.email,
+        name: userCreated.name,
+        token,
       });
 
       return res.status(201).send({
         status: "success",
         message:
           "¡Cuenta creada con exito!, ¡Revisa tu Email para confirmarla!",
+        token,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+  static confirmAccount = async (req: Request, res: Response) => {
+    try {
+      const token = await Token.findOne({
+        token: req.body.token,
+      });
+
+      if (!token) {
+        const error = new Error("El token ya fue confirmado o ya expiro");
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      const user = await User.findOne({
+        _id: token.user,
+      });
+
+      user.confirmed = true;
+      await user.save();
+      await token.deleteOne();
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Cuenta confirmada con exito!",
       });
     } catch (error) {
       console.log(error);

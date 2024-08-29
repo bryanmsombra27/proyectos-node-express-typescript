@@ -20,7 +20,7 @@ router.post(
       .isLength({
         min: 6,
       })
-      .withMessage("La contraseña debe tener minimo 8 caracteres"),
+      .withMessage("La contraseña debe tener minimo 6 caracteres"),
     body("password_confirmation").custom((value, { req }) => {
       if (req.body.password !== value) {
         throw new Error("Los passwords no son iguales");
@@ -31,6 +31,25 @@ router.post(
   ],
   Auth.createAccount
 );
-router.post("/", Auth.login);
+router.post(
+  "/",
+  [
+    body("email")
+      .notEmpty()
+      .withMessage("El email es requerido")
+      .isEmail()
+      .withMessage("Debe ser un email valido"),
+    body("password").notEmpty().withMessage("El campo es requerido"),
+  ],
+  Auth.login
+);
+router.post(
+  "/confirm-account",
+  [
+    body("token").notEmpty().withMessage("El campo no puede ir vacio"),
+    validarCampos,
+  ],
+  Auth.confirmAccount
+);
 
 export default router;
