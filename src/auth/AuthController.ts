@@ -147,4 +147,51 @@ export class Auth {
       });
     }
   };
+  static requestConfirmationCode = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findOne({
+        email: req.body.email,
+      });
+      if (!user) {
+        const error = new Error("El usuario no esta registrado");
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+      if (user.confirmed) {
+        const error = new Error("El usuario ya esta registrado");
+        return res.status(403).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      // GENERAR TOKEN DE CONFIRMACION DE CUENTA
+      const token = tokenSixDigits();
+
+      await Token.create({
+        token,
+        user: user._id,
+      });
+
+      AuthEmail.sendConfirmationEmail({
+        email: user.email,
+        name: user.name,
+        token,
+      });
+
+      return res.status(201).send({
+        status: "success",
+        message: "¡Token generado con exito!, ¡Revisa tu Email para confirmar!",
+        token,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
 }

@@ -52,4 +52,17 @@ router.post(
   Auth.confirmAccount
 );
 
+router.post(
+  "/request-code",
+  [
+    body("email")
+      .notEmpty()
+      .withMessage("El campo no puede ir vacio")
+      .isEmail()
+      .withMessage("Debe ser un email valido"),
+    validarCampos,
+  ],
+  Auth.requestConfirmationCode
+);
+
 export default router;
