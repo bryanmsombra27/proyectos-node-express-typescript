@@ -194,4 +194,109 @@ export class Auth {
       });
     }
   };
+  static forgotPassword = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findOne({
+        email: req.body.email,
+      });
+      if (!user) {
+        const error = new Error("El usuario no esta registrado");
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      // GENERAR TOKEN DE CONFIRMACION DE CUENTA
+      const token = tokenSixDigits();
+
+      await Token.create({
+        token,
+        user: user._id,
+      });
+
+      AuthEmail.sendPasswordResetToken({
+        email: user.email,
+        name: user.name,
+        token,
+      });
+
+      return res.status(201).send({
+        status: "success",
+        message: "Revisa tu email para instrucciones",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+
+  static validateToken = async (req: Request, res: Response) => {
+    try {
+      const token = await Token.findOne({
+        token: req.body.token,
+      });
+
+      if (!token) {
+        const error = new Error("El token ya fue confirmado o ya expiro");
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      const user = await User.findOne({
+        _id: token.user,
+      });
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Cuenta confirmada con exito!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+  static updatePasswordWithToken = async (req: Request, res: Response) => {
+    try {
+      const token = await Token.findOne({
+        token: req.params.token,
+      });
+
+      if (!token) {
+        const error = new Error("El token ya fue confirmado o ya expiro");
+        return res.status(404).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      const user = await User.findOne({
+        _id: token.user,
+      });
+      const newHashPassword = await passwordHashed(req.body.password);
+
+      user.password = newHashPassword;
+      await token.deleteOne();
+      await user.save();
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Contraseña actualizada con exito!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
 }
