@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Auth } from "../auth/AuthController";
 import { body, param } from "express-validator";
 import { validarCampos } from "../middlewares/expressValidator";
+import { authenticate } from "../middlewares/auth";
 
 const router = Router();
 
@@ -40,6 +41,7 @@ router.post(
       .isEmail()
       .withMessage("Debe ser un email valido"),
     body("password").notEmpty().withMessage("El campo es requerido"),
+    validarCampos,
   ],
   Auth.login
 );
@@ -106,5 +108,6 @@ router.post(
   ],
   Auth.updatePasswordWithToken
 );
+router.get("/user", authenticate, Auth.user);
 
 export default router;

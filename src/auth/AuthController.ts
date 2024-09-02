@@ -5,6 +5,7 @@ import { tokenSixDigits } from "../helpers/Token";
 import Token from "../models/Token";
 import transporter from "../config/transport";
 import { AuthEmail } from "../emails/authEmail";
+import { generateJWT } from "../helpers/JWT";
 
 export class Auth {
   static login = async (req: Request, res: Response) => {
@@ -44,6 +45,7 @@ export class Auth {
           message: error.message,
         });
       }
+
       const verifyPass = await passwordVerify(req.body.password, user.password);
 
       if (!verifyPass) {
@@ -54,10 +56,14 @@ export class Auth {
           message: error.message,
         });
       }
+      const token = generateJWT({
+        id: user._id,
+      });
 
       return res.status(200).send({
         status: "success",
         message: "Acceso Exitoso!",
+        token,
       });
     } catch (error) {
       console.log(error);
@@ -290,6 +296,21 @@ export class Auth {
       return res.status(200).send({
         status: "success",
         message: "¡Contraseña actualizada con exito!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+  static user = async (req: Request, res: Response) => {
+    try {
+      return res.status(200).send({
+        status: "success",
+        message: "¡Usuario!",
+        user: req.user,
       });
     } catch (error) {
       console.log(error);

@@ -4,7 +4,9 @@ import Project from "../models/Project";
 export class ProjectController {
   static getAllProjects = async (req: Request, res: Response) => {
     try {
-      const projects = await Project.find();
+      const projects = await Project.find({
+        manager: req.user._id,
+      });
 
       return res.status(200).send({
         status: "success",
@@ -20,7 +22,11 @@ export class ProjectController {
   };
   static getOneProject = async (req: Request, res: Response) => {
     try {
-      const project = await Project.findById(req.params.id).populate("tasks");
+      // const project = await Project.findById(req.params.id).populate("tasks");
+      const project = await Project.findOne({
+        _id: req.params.id,
+        manager: req.user._id,
+      }).populate("tasks");
 
       if (!project) {
         const error = new Error("No se encontro proyecto");
@@ -46,7 +52,10 @@ export class ProjectController {
 
   static createProjects = async (req: Request, res: Response) => {
     try {
-      const project = await Project.create(req.body);
+      const project = await Project.create({
+        ...req.body,
+        manager: req.user._id,
+      });
 
       return res.status(201).send({
         status: "success",

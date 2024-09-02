@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document, PopulatedDoc, Types } from "mongoose";
 import { TaskType } from "./Task";
+import { UserType } from "./User";
 
 export interface ProjectType extends Document {
   projectName: string;
   clientName: string;
   description: string;
   tasks: PopulatedDoc<TaskType>[];
+  manager: PopulatedDoc<UserType>;
 }
 
 const ProjectSchema = new Schema(
@@ -31,6 +33,10 @@ const ProjectSchema = new Schema(
         ref: "Task",
       },
     ],
+    manager: {
+      type: Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
