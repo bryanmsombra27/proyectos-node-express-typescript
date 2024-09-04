@@ -5,6 +5,7 @@ import { validarCampos } from "../middlewares/expressValidator";
 import { TaskController } from "../controllers/TaskController";
 import { projectExists } from "../middlewares/Project";
 import { authenticate } from "../middlewares/auth";
+import { TeamController } from "../controllers/TeamController";
 
 const router = Router();
 // PROJECTS ROUTES
@@ -117,6 +118,55 @@ router.post(
     validarCampos,
   ],
   TaskController.updateProjectTaskStatus
+);
+
+// TEAM  ROUTES
+router.post(
+  "/:projectId/team/find",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    body("email")
+      .notEmpty()
+      .withMessage("El campo es obligatorio")
+      .isEmail()
+      .withMessage("Debe ser un email valido"),
+    validarCampos,
+  ],
+  TeamController.findMemberByEmail
+);
+router.post(
+  "/:projectId/team",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    body("id")
+      .notEmpty()
+      .withMessage("El campo es obligatorio")
+      .isMongoId()
+      .withMessage("Debe ser un id valido"),
+    validarCampos,
+  ],
+  TeamController.addMemberById
+);
+router.delete(
+  "/:projectId/team/:id",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    param("id")
+      .notEmpty()
+      .withMessage("El campo es obligatorio")
+      .isMongoId()
+      .withMessage("Debe ser un id valido"),
+    validarCampos,
+  ],
+  TeamController.deleteMemberById
+);
+router.get(
+  "/:projectId/team",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    validarCampos,
+  ],
+  TeamController.getTeamMembers
 );
 
 export default router;

@@ -8,6 +8,7 @@ export interface ProjectType extends Document {
   description: string;
   tasks: PopulatedDoc<TaskType>[];
   manager: PopulatedDoc<UserType>;
+  team: PopulatedDoc<UserType>[];
 }
 
 const ProjectSchema = new Schema(
@@ -37,6 +38,12 @@ const ProjectSchema = new Schema(
       type: Types.ObjectId,
       ref: "User",
     },
+    team: [
+      {
+        type: Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,
