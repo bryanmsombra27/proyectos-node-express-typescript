@@ -3,7 +3,7 @@ import { ProjectController } from "../controllers/ProjectController";
 import { body, param } from "express-validator";
 import { validarCampos } from "../middlewares/expressValidator";
 import { TaskController } from "../controllers/TaskController";
-import { projectExists } from "../middlewares/Project";
+import { hasAuth, projectExists } from "../middlewares/Project";
 import { authenticate } from "../middlewares/auth";
 import { TeamController } from "../controllers/TeamController";
 
@@ -65,6 +65,8 @@ router.post(
     body("description").notEmpty().withMessage("La descripcion es obligatoria"),
     validarCampos,
   ],
+  authenticate,
+  hasAuth,
   TaskController.createTask
 );
 router.get(
@@ -74,6 +76,7 @@ router.get(
 
     validarCampos,
   ],
+  authenticate,
   TaskController.getProjectTasks
 );
 router.get(
@@ -84,6 +87,7 @@ router.get(
 
     validarCampos,
   ],
+  authenticate,
   TaskController.getProjectTaskById
 );
 router.put(
@@ -95,6 +99,8 @@ router.put(
     body("description").notEmpty().withMessage("La descripcion es obligatoria"),
     validarCampos,
   ],
+  authenticate,
+  hasAuth,
   TaskController.uptadeProjectTask
 );
 
@@ -106,6 +112,8 @@ router.delete(
 
     validarCampos,
   ],
+  authenticate,
+  hasAuth,
   TaskController.deleteProjectTask
 );
 
@@ -117,6 +125,7 @@ router.post(
     body("status").notEmpty().withMessage("El estado es obligatorio"),
     validarCampos,
   ],
+  authenticate,
   TaskController.updateProjectTaskStatus
 );
 

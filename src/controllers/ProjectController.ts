@@ -5,7 +5,14 @@ export class ProjectController {
   static getAllProjects = async (req: Request, res: Response) => {
     try {
       const projects = await Project.find({
-        manager: req.user._id,
+        $or: [
+          {
+            manager: req.user._id,
+          },
+          {
+            team: req.user._id,
+          },
+        ],
       });
 
       return res.status(200).send({
@@ -22,11 +29,11 @@ export class ProjectController {
   };
   static getOneProject = async (req: Request, res: Response) => {
     try {
-      // const project = await Project.findById(req.params.id).populate("tasks");
-      const project = await Project.findOne({
-        _id: req.params.id,
-        manager: req.user._id,
-      }).populate("tasks");
+      const project = await Project.findById(req.params.id).populate("tasks");
+      // const project = await Project.findOne({
+      //   _id: req.params.id,
+      //   manager: req.user._id,
+      // }).populate("tasks");
 
       if (!project) {
         const error = new Error("No se encontro proyecto");

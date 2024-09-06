@@ -36,3 +36,20 @@ export const projectExists = async (
     });
   }
 };
+
+export const hasAuth = (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.user, "USUARIO");
+
+  if (req.user?._id.toString() !== req.project.manager.toString()) {
+    const error = new Error(
+      "No tienes autorizacion para eliminar o editar tareas en este proyecto"
+    );
+
+    return res.status(403).send({
+      status: "error",
+      message: error.message,
+    });
+  }
+
+  next();
+};
