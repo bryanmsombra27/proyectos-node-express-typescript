@@ -56,7 +56,9 @@ export class TaskController {
       const task = await Task.findOne({
         project: project._id,
         _id: taskId,
-      }).populate("project");
+      })
+        .populate("project")
+        .populate("completedBy.user", "_id name email");
 
       console.log(task, "TAREA");
       console.log(project._id, "ID PROYECTO");
@@ -154,8 +156,12 @@ export class TaskController {
   };
   static updateProjectTaskStatus = async (req: Request, res: Response) => {
     try {
-      const { project } = req;
+      const { project, user } = req;
       const { taskId } = req.params;
+      const data: any = {
+        user: user._id,
+        status: req.body.status,
+      };
 
       const task = await Task.findOneAndUpdate(
         {
@@ -169,6 +175,7 @@ export class TaskController {
           new: true,
         }
       );
+
       if (!task) {
         const error = new Error("No se encontro tarea");
         return res.status(404).send({
@@ -176,7 +183,8 @@ export class TaskController {
           message: error.message,
         });
       }
-
+      task.completedBy.push(data);
+      await task.save();
       return res.status(200).send({
         status: "success",
         message: "Estatus actualizado con exito!",
