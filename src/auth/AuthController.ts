@@ -320,4 +320,69 @@ export class Auth {
       });
     }
   };
+  static updateProfile = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findOne({
+        email: req.body.email,
+      });
+
+      if (user && user._id.toString() !== req.user._id.toString()) {
+        const error = new Error("El correo ya fue registrado");
+        return res.status(409).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+      req.user.name = req.body.name;
+      req.user.email = req.body.email;
+
+      await req.user.save();
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Perfil actualizado con exito!",
+        user: req.user,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+  static updatePassword = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findById(req.user._id);
+
+      const verificationPassword = await passwordVerify(
+        req.body.password,
+        user.password
+      );
+      if (!verificationPassword) {
+        const error = new Error("verificar la contrasñea anterior");
+        return res.status(401).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+      const newPasswordHashed = await passwordHashed(req.body.new_password);
+
+      user.password = newPasswordHashed;
+
+      await user.save();
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Contraseña actualizada con exito!",
+        user: req.user,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
 }

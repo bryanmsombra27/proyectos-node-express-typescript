@@ -110,4 +110,51 @@ router.post(
 );
 router.get("/user", authenticate, Auth.user);
 
+// PROFILE
+router.put(
+  "/profile",
+  [
+    body("name").notEmpty().withMessage("El campo es requerido"),
+    body("email")
+      .notEmpty()
+      .withMessage("El campo es requerido")
+      .isEmail()
+      .withMessage("Debe ser un email valido"),
+
+    validarCampos,
+  ],
+  authenticate,
+  Auth.updateProfile
+);
+router.put(
+  "/update-password",
+  [
+    body("password")
+      .notEmpty()
+      .withMessage("El campo es requerido")
+      .isLength({
+        min: 6,
+      })
+      .withMessage("La contraseña debe tener minimo 6 caracteres"),
+
+    body("new_password")
+      .notEmpty()
+      .withMessage("El campo es requerido")
+      .isLength({
+        min: 6,
+      })
+      .withMessage("La contraseña debe tener minimo 6 caracteres"),
+    body("password_confirmation").custom((value, { req }) => {
+      if (req.body.new_password !== value) {
+        throw new Error("Los passwords no son iguales");
+      }
+      return true;
+    }),
+    validarCampos,
+  ],
+
+  authenticate,
+  Auth.updatePassword
+);
+
 export default router;
