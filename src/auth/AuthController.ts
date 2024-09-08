@@ -361,7 +361,7 @@ export class Auth {
       );
       if (!verificationPassword) {
         const error = new Error("verificar la contrasñea anterior");
-        return res.status(401).send({
+        return res.status(40).send({
           status: "error",
           message: error.message,
         });
@@ -376,6 +376,35 @@ export class Auth {
         status: "success",
         message: "¡Contraseña actualizada con exito!",
         user: req.user,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+        status: "error",
+        message: "Error en el servidor",
+      });
+    }
+  };
+  static checkPassword = async (req: Request, res: Response) => {
+    try {
+      const user = await User.findById(req.user._id);
+
+      const verificationPassword = await passwordVerify(
+        req.body.password,
+        user.password
+      );
+      if (!verificationPassword) {
+        const error = new Error("No fue posible confirmar la contraseña");
+        return res.status(40).send({
+          status: "error",
+          message: error.message,
+        });
+      }
+
+      return res.status(200).send({
+        status: "success",
+        message: "¡Contraseña confirmada con exito!",
+        confirm: true,
       });
     } catch (error) {
       console.log(error);

@@ -156,5 +156,20 @@ router.put(
   authenticate,
   Auth.updatePassword
 );
+router.post(
+  "/check-password",
+  [
+    body("password")
+      .notEmpty()
+      .withMessage("El campo es requerido")
+      .isLength({
+        min: 6,
+      })
+      .withMessage("La contraseña debe tener minimo 6 caracteres"),
+    validarCampos,
+  ],
+  authenticate,
+  Auth.checkPassword
+);
 
 export default router;
