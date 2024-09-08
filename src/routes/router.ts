@@ -6,6 +6,7 @@ import { TaskController } from "../controllers/TaskController";
 import { hasAuth, projectExists } from "../middlewares/Project";
 import { authenticate } from "../middlewares/auth";
 import { TeamController } from "../controllers/TeamController";
+import { NoteController } from "../controllers/NoteController";
 
 const router = Router();
 // PROJECTS ROUTES
@@ -176,6 +177,41 @@ router.get(
     validarCampos,
   ],
   TeamController.getTeamMembers
+);
+
+// ROUTES FOR NOTES
+router.post(
+  "/:projectId/tasks/:taskId/notes",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    param("taskId").isMongoId().withMessage("Debe ser un id valido"),
+    body("content").notEmpty().withMessage("El contenido es obligatorio"),
+    validarCampos,
+  ],
+  authenticate,
+  NoteController.createNote
+);
+router.get(
+  "/:projectId/tasks/:taskId/notes",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    param("taskId").isMongoId().withMessage("Debe ser un id valido"),
+    body("content").notEmpty().withMessage("El contenido es obligatorio"),
+    validarCampos,
+  ],
+  authenticate,
+  NoteController.getTaskNotes
+);
+router.delete(
+  "/:projectId/tasks/:taskId/notes/:noteId",
+  [
+    param("projectId").isMongoId().withMessage("Debe ser un id valido"),
+    param("taskId").isMongoId().withMessage("Debe ser un id valido"),
+    param("noteId").isMongoId().withMessage("Debe ser un id valido"),
+    validarCampos,
+  ],
+  authenticate,
+  NoteController.deleteNote
 );
 
 export default router;

@@ -58,8 +58,11 @@ export class TaskController {
         _id: taskId,
       })
         .populate("project")
-        .populate("completedBy.user", "_id name email");
-
+        .populate("completedBy.user", "_id name email")
+        .populate({
+          path: "notes",
+          populate: { path: "createdBy", select: "_id name email" },
+        });
       console.log(task, "TAREA");
       console.log(project._id, "ID PROYECTO");
 

@@ -19,6 +19,7 @@ export interface TaskType extends Document {
     user: Types.ObjectId;
     status: TaskStatus;
   }[];
+  notes: Types.ObjectId[];
 }
 
 const taskSchema = new Schema(
@@ -57,7 +58,15 @@ const taskSchema = new Schema(
         },
       },
     ],
+    notes: [
+      {
+        type: Types.ObjectId,
+        ref: "Note",
+        default: null,
+      },
+    ],
   },
+
   {
     timestamps: true,
   }
